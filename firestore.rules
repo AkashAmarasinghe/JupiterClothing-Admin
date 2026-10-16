@@ -1,0 +1,94 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Keep this email in sync with ADMIN_EMAIL in
+    // src/assets/js/firebase-config.js
+    function isAdmin() {
+      return signedIn()
+        && request.auth.token.email != null
+        && request.auth.token.email == 'kusal@gmail.com';
+    }
+
+    // Product catalogue is readable before login in the Android app.
+    match /products/{productId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // A customer can manage only their own profile. The admin can read
+    // customers and update notification summary fields.
+    match /users/{userId} {
+      allow read: if isAdmin() || (signedIn() && request.auth.uid == userId);
+      allow create: if signedIn() && request.auth.uid == userId;
+      allow update: if isAdmin() || (signedIn() && request.auth.uid == userId);
+      allow delete: if isAdmin() || (signedIn() && request.auth.uid == userId);
+
+      match /cart/{cartId} {
+        allow read, create, update, delete: if signedIn() && request.auth.uid == userId;
+      }
+
+      // The current Android project contains this misspelled collection name.
+      match /whishlist/{wishlistId} {
+        allow read, create, update, delete: if signedIn() && request.auth.uid == userId;
+      }
+
+      // Also support the correctly-spelled collection for future builds.
+      match /wishlist/{wishlistId} {
+        allow read, create, update, delete: if signedIn() && request.auth.uid == userId;
+      }
+
+      match /notifications/{notificationId} {
+        allow read, update, delete: if signedIn() && request.auth.uid == userId;
+        allow create: if isAdmin() || (signedIn() && request.auth.uid == userId);
+      }
+    }
+
+    // Android PayHere success writes one document to `payments`.
+    // The customer may create/read their own records. The fixed admin email
+    // can read every payment for Dashboard / Orders / Reports.
+    match /payments/{paymentId} {
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid;
+
+      allow read: if isAdmin()
+        || (signedIn() && resource.data.userId == request.auth.uid);
+
+      // The Android project updates the generated document with its Firestore
+      // id immediately after add(). Keep userId immutable while allowing that.
+      allow update: if isAdmin()
+        || (signedIn()
+          && resource.data.userId == request.auth.uid
+          && request.resource.data.userId == request.auth.uid);
+
+      allow delete: if isAdmin();
+    }
+
+    // Compatibility with earlier / alternative order-saving builds.
+    match /orders/{orderId} {
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid;
+      allow read: if isAdmin()
+        || (signedIn() && resource.data.userId == request.auth.uid);
+      allow update: if isAdmin()
+        || (signedIn()
+          && resource.data.userId == request.auth.uid
+          && request.resource.data.userId == request.auth.uid);
+      allow delete: if isAdmin();
+    }
+
+    // Everything else stays closed by default.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

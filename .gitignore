@@ -1,0 +1,76 @@
+
+# ==========================================
+# Jupiter Clothing Admin Dashboard
+# Git Ignore Configuration
+# ==========================================
+
+# Dependencies
+node_modules/
+**/node_modules/
+jspm_packages/
+
+# Build Output
+dist/
+build/
+coverage/
+.next/
+.cache/
+.parcel-cache/
+.vite/
+
+# Environment Variables
+.env
+.env.*
+!.env.example
+
+# Firebase Configuration
+src/assets/js/firebase-config.js
+.firebase/
+
+# Firebase Admin Credentials
+serviceAccountKey.json
+service-account.json
+**/service-account*.json
+*-firebase-adminsdk-*.json
+
+# Private Keys and Certificates
+*.pem
+*.p12
+*.pfx
+*.key
+*.keystore
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE Configuration
+.idea/
+.vscode/
+*.code-workspace
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# Temporary Files
+*.tmp
+*.bak
+*.swp
+
+# Local Database Files
+*.sqlite
+*.sqlite3
+*.db
+
+# Archives
+*.zip
+
+# Test and Cache Files
+.nyc_output/
+.eslintcache
+.stylelintcache
+*.tsbuildinfo

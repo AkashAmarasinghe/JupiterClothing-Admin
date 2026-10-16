@@ -1,0 +1,15 @@
+JUPITER ADMIN PAYMENT/DASHBOARD FIX
+
+Fixed:
+- Dashboard no longer stays blank when one Firestore collection fails.
+- Recent payments update live from Firestore `payments`.
+- Orders page loads Android payment records and supports legacy order collection names.
+- Payment code, customer, product, amount, status and paid date normalization improved.
+- Revenue and 7-day charts render even when some days have zero sales.
+- Customers / Products / Categories / Notifications pages now surface Firebase load errors instead of silently breaking.
+- Added secure Firestore rules for the current admin email (kusal@gmail.com).
+- Added FIRESTORE_PAYMENT_FIX.md with the exact publish/deploy steps.
+
+IMPORTANT:
+The web code cannot bypass Firestore Security Rules. Publish the included firestore.rules once.
+After publishing, sign out/in to the admin panel and refresh.
